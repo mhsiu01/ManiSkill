@@ -4,7 +4,7 @@ Useful utilities for creating the ground of a scene
 from __future__ import annotations
 
 import os.path as osp
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, List, Optional
 
 import numpy as np
 import sapien
@@ -21,6 +21,7 @@ def build_ground(
     xy_origin: tuple = (0, 0),
     altitude=0,
     name="ground",
+    scene_idxs: Optional[List[int]] = None,
 ):
     """Procedurally creates a checkered floor given a floor width in meters.
 
@@ -28,6 +29,11 @@ def build_ground(
     and usually is never run more than once as it is for building a scene, not loading.
     """
     ground = scene.create_actor_builder()
+    if scene_idxs is not None:
+        name = name + f"-{scene_idxs[0]}"
+        print(f"New ground name: {name}")
+        ground.set_scene_idxs(scene_idxs)
+        
     ground.add_plane_collision(
         sapien.Pose(p=[0, 0, altitude], q=[0.7071068, 0, -0.7071068, 0]),
     )

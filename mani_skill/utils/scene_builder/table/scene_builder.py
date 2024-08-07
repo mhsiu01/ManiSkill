@@ -1,6 +1,6 @@
 import os.path as osp
 from pathlib import Path
-from typing import List
+from typing import List, Optional
 
 import numpy as np
 import sapien
@@ -16,12 +16,18 @@ from mani_skill.utils.scene_builder import SceneBuilder
 
 # TODO (stao): make the build and initialize api consistent with other scenes
 class TableSceneBuilder(SceneBuilder):
-    def build(self):
+    def build(self, scene_idxs: Optional[List[int]] = None):
         builder = self.scene.create_actor_builder()
         model_dir = Path(osp.dirname(__file__)) / "assets"
         table_model_file = str(model_dir / "table.glb")
         scale = 1.75
-
+        
+        if scene_idxs is not None:
+            assert len(scene_idxs)==1
+            builder.set_scene_idxs(scene_idxs)
+            table_name = f"table-workspace-{scene_idxs[0]}"
+        else:
+            table_name = "table-workspace"
         table_pose = sapien.Pose(q=euler2quat(0, 0, np.pi / 2))
         # builder.add_nonconvex_collision_from_file(
         #     filename=table_model_file,
@@ -35,7 +41,7 @@ class TableSceneBuilder(SceneBuilder):
         builder.add_visual_from_file(
             filename=table_model_file, scale=[scale] * 3, pose=table_pose
         )
-        table = builder.build_kinematic(name="table-workspace")
+        table = builder.build_kinematic(name=table_name)
         aabb = (
             table._objs[0]
             .find_component_by_type(sapien.render.RenderBodyComponent)
@@ -48,17 +54,26 @@ class TableSceneBuilder(SceneBuilder):
         if self.scene.parallel_in_single_scene:
             floor_width = 500
         self.ground = build_ground(
-            self.scene, floor_width=floor_width, altitude=-self.table_height
+            self.scene, floor_width=floor_width, altitude=-self.table_height, scene_idxs=scene_idxs,
         )
         self.table = table
         self.scene_objects: List[sapien.Entity] = [self.table, self.ground]
 
-    def initialize(self, env_idx: torch.Tensor):
+    def initialize(self, env_idx: torch.Tensor, scene_idxs: Optional[List[int]] = None):
         # table_height = 0.9196429
         b = len(env_idx)
         self.table.set_pose(
             sapien.Pose(p=[-0.12, 0, -self.table_height], q=euler2quat(0, 0, np.pi / 2))
         )
+        
+        print(f"{env_idx=} and {b=} and {scene_idxs=}")
+        # Only need to initialize robots once, since it spans all sub-scenes.
+        # Hence, skip if scene_idxs not specified or >0 (hence already initialized).
+        assert env_idx[0]==0
+        if scene_idxs is not None and scene_idxs[0]>0:
+            assert len(scene_idxs)==1
+            return
+            
         if self.env.robot_uids == "panda":
             qpos = np.array(
                 [

@@ -1,6 +1,7 @@
 """
 Common utilities for adding primitive prebuilt shapes to a scene
 """
+from typing import List, Optional
 
 import numpy as np
 import sapien
@@ -30,8 +31,11 @@ def build_cube(
     name: str,
     body_type: str = "dynamic",
     add_collision: bool = True,
+    scene_idxs: Optional[List[int]] = None,
 ):
     builder = scene.create_actor_builder()
+    if scene_idxs is not None:
+        builder.set_scene_idxs(scene_idxs)
     if add_collision:
         builder.add_box_collision(
             half_size=[half_size] * 3,
@@ -96,9 +100,12 @@ def build_red_white_target(
     name: str,
     body_type: str = "dynamic",
     add_collision: bool = True,
+    scene_idxs: Optional[List[int]] = None,
 ):
     TARGET_RED = np.array([194, 19, 22, 255]) / 255
     builder = scene.create_actor_builder()
+    if scene_idxs is not None:
+        builder.set_scene_idxs(scene_idxs)
     builder.add_cylinder_visual(
         radius=radius,
         half_length=thickness / 2,
