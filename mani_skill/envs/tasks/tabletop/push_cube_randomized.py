@@ -1,5 +1,5 @@
 """
-Code for a minimal environment/task with just a robot being loaded, with visual randomization (random texture, color, lighting). We recommend copying this template and modifying as you need.
+Code for a minimal environment/task with just a robot being loaded, WITH VISUAL RANDOMIZATION (random texture, color, lighting, camera pose). We recommend copying this template and modifying as you need.
 
 At a high-level, ManiSkill tasks can minimally be defined by how the environment resets, what agents/objects are
 loaded, goal parameterization, and success conditions
@@ -16,6 +16,7 @@ See comments for how to make your own environment and what each required functio
 """
 
 from typing import Any, Dict, Union
+import os 
 
 import numpy as np
 import torch
