@@ -170,6 +170,7 @@ class BaseEnv(gym.Env):
         render_backend: str = "gpu",
 
         parallel_in_single_scene: bool = False,
+        # options = dict(),
     ):
         self.num_envs = num_envs
         self.reconfiguration_freq = reconfiguration_freq if reconfiguration_freq is not None else 0
@@ -315,6 +316,8 @@ class BaseEnv(gym.Env):
         self._elapsed_steps = (
             torch.zeros(self.num_envs, device=self.device, dtype=torch.int32)
         )
+        # options = dict(options.items() + dict(reconfigure=True))
+        # obs, _ = self.reset(seed=2022, options=options)
         obs, _ = self.reset(seed=2022, options=dict(reconfigure=True))
         self._init_raw_obs = common.to_cpu_tensor(obs)
         """the raw observation returned by the env.reset (a cpu torch tensor/dict of tensors). Useful for future observation wrappers to use to auto generate observation spaces"""
