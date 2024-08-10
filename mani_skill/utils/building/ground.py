@@ -31,7 +31,6 @@ def build_ground(
     ground = scene.create_actor_builder()
     if scene_idxs is not None:
         name = name + f"-{scene_idxs[0]}"
-        print(f"New ground name: {name}")
         ground.set_scene_idxs(scene_idxs)
         
     ground.add_plane_collision(

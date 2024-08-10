@@ -21,13 +21,15 @@ class TableSceneBuilder(SceneBuilder):
         model_dir = Path(osp.dirname(__file__)) / "assets"
         table_model_file = str(model_dir / "table.glb")
         scale = 1.75
-        
+
+        # Name individual table scenes
         if scene_idxs is not None:
             assert len(scene_idxs)==1
             builder.set_scene_idxs(scene_idxs)
             table_name = f"table-workspace-{scene_idxs[0]}"
         else:
             table_name = "table-workspace"
+            
         table_pose = sapien.Pose(q=euler2quat(0, 0, np.pi / 2))
         # builder.add_nonconvex_collision_from_file(
         #     filename=table_model_file,
@@ -65,14 +67,12 @@ class TableSceneBuilder(SceneBuilder):
         self.table.set_pose(
             sapien.Pose(p=[-0.12, 0, -self.table_height], q=euler2quat(0, 0, np.pi / 2))
         )
-        
-        print(f"{env_idx=} and {b=} and {scene_idxs=}")
         # Only need to initialize robots once, since it spans all sub-scenes.
         # Hence, skip if scene_idxs not specified or >0 (hence already initialized).
-        assert env_idx[0]==0
-        if scene_idxs is not None and scene_idxs[0]>0:
+        if scene_idxs is not None:
             assert len(scene_idxs)==1
-            return
+            if scene_idxs[0]>0:
+                return
             
         if self.env.robot_uids == "panda":
             qpos = np.array(
