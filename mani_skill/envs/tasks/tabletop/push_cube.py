@@ -363,8 +363,9 @@ class PushCubeRandomizedEnv(PushCubeEnv):
         if "lighting" not in options.keys():
             super()._load_lighting(options)
         else:
-            # Set shared shadow and ambient across all sub-scenes
+            # Set shared shadow 
             shadow = self.enable_shadow
+            # Randomized ambient light per sub-scene
             if "ambient" in options["lighting"]:
                 ambient_min = np.array(options["lighting"]["ambient"][0])
                 ambient_max = np.array(options["lighting"]["ambient"][1])
@@ -373,10 +374,10 @@ class PushCubeRandomizedEnv(PushCubeEnv):
                     ambient_light = np.append(ambient_light, i)
                     self.scene.set_ambient_light(ambient_light)
 
-            # Loop through sub-scenes for randomized lights
+            # Randomized directional lights per sub-scene
             if "directional" in options["lighting"]:
                 for i in range(self.num_envs):
-                    # Add specified directional lights
+                    # Add config-specified directional lights per sub-scene
                     for d in options["lighting"]["directional"]:
                         direction_min = np.array(d["direction"][0])
                         direction_max = np.array(d["direction"][1])
