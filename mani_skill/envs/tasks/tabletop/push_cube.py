@@ -328,8 +328,7 @@ class PushCubeRandomizedEnv(PushCubeEnv):
             for i in range(self.num_envs):
                 # Iterate through specified actors of i-th sub-scene
                 for actor_name, rand_dict in options["actors"].items():
-                    print(actor_name, i)
-                    actor = self.scene.actors[f"{actor_name}-{i}"] # eg. actor_name="cube", i=5 --> actor=cube-5
+                    actor = self.scene.actors[f"{actor_name}-{i}"] # eg. actor_name="cube", i=5 --> actor=cube 5
                     # Apply all randomizations to this actor
                     for rand_type, rand_value in rand_dict.items():
                         if rand_type=="texture" and rand_value is True:
@@ -369,8 +368,10 @@ class PushCubeRandomizedEnv(PushCubeEnv):
             if "ambient" in options["lighting"]:
                 ambient_min = np.array(options["lighting"]["ambient"][0])
                 ambient_max = np.array(options["lighting"]["ambient"][1])
-                ambient_light = ambient_min + np.random.rand(3)*(ambient_max - ambient_min)
-                self.scene.set_ambient_light(ambient_light)
+                for i in range(self.num_envs):
+                    ambient_light = ambient_min + np.random.rand(3)*(ambient_max - ambient_min)
+                    ambient_light = np.append(ambient_light, i)
+                    self.scene.set_ambient_light(ambient_light)
 
             # Loop through sub-scenes for randomized lights
             if "directional" in options["lighting"]:

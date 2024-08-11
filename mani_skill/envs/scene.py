@@ -494,8 +494,14 @@ class ManiSkillScene:
 
     @ambient_light.setter
     def ambient_light(self, color):
-        for scene in self.sub_scenes:
-            scene.render_system.ambient_light = color
+        if len(color)==4:
+            idx = int(color[3])
+            assert idx>=0
+            color_value = color[0:3]
+            self.sub_scenes[idx].render_system.ambient_light = color_value
+        else:
+            for scene in self.sub_scenes:
+                scene.render_system.ambient_light = color
 
     def set_ambient_light(self, color):
         self.ambient_light = color
