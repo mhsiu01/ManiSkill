@@ -258,13 +258,14 @@ class PushCubeRandomizedEnv(PushCubeEnv):
                     triangle.material.set_base_color_texture(texture)
     
     def _randomize_color(self, obj, color):
-        if color.ndim==2:
+        if len(color)==2:
             color_min = np.array(color[0])
             color_max = np.array(color[1])
             # Uniform sample within interval [color_min, color_max]
             final_color = color_min + np.random.rand(3)*(color_max - color_min)
         else:
             final_color = color
+        final_color = np.append(final_color, 1.0) # Append 4th alpha channel
             
         for part in obj._objs:
             for render_shape in part.find_component_by_type(sapien.render.RenderBodyComponent).render_shapes:
@@ -321,31 +322,33 @@ class PushCubeRandomizedEnv(PushCubeEnv):
             # and are there just for generating evaluation videos.
             # self._hidden_objects.append(self.goal_region)
 
-        # Loop over sub-scenes
-        for i in range(self.num_envs):
-            # Iterate through specified actors of the sub-scene
-            for actor_name, rand_dict in options["actors"].items():
-                print(actor_name, i)
-                actor = self.scene.actors[f"{actor_name}-{i}"] # eg. actor_name="cube", i=5 --> actor=cube-5
-                # Apply all randomizations to this actor
-                for rand_type, rand_value in rand_dict.items():
-                    if rand_type=="texture" and rand_value is True:
-                        self._randomize_texture(obj=actor)
-                    elif rand_type=="color":
-                        self.randomize_color(obj=actor, color=rand_value)
-                    
-            # # Randomize table texture
-            # table = self.tables[i]
-            # self._randomize_texture(obj=table)
-            # # Randomize ground texture
-            # ground = self.grounds[i]
-            # self._randomize_texture(obj=ground)
-            # # Randomize cube color: Cycle through red, green, and blue cubes
-            # color = np.array([0,0,0,255])
-            # color[i%3] = 255
-            # color = color / 255.0
-            # obj = self.objs[i]
-            # self._randomize_color(obj=obj, color=color)
+        # Check if config exists
+        if "actors" in options:
+            # If so, loop over sub-scenes and randomize
+            for i in range(self.num_envs):
+                # Iterate through specified actors of i-th sub-scene
+                for actor_name, rand_dict in options["actors"].items():
+                    print(actor_name, i)
+                    actor = self.scene.actors[f"{actor_name}-{i}"] # eg. actor_name="cube", i=5 --> actor=cube-5
+                    # Apply all randomizations to this actor
+                    for rand_type, rand_value in rand_dict.items():
+                        if rand_type=="texture" and rand_value is True:
+                            self._randomize_texture(obj=actor)
+                        elif rand_type=="color":
+                            self._randomize_color(obj=actor, color=rand_value)
+                        
+                # # Randomize table texture
+                # table = self.tables[i]
+                # self._randomize_texture(obj=table)
+                # # Randomize ground texture
+                # ground = self.grounds[i]
+                # self._randomize_texture(obj=ground)
+                # # Randomize cube color: Cycle through red, green, and blue cubes
+                # color = np.array([0,0,0,255])
+                # color[i%3] = 255
+                # color = color / 255.0
+                # obj = self.objs[i]
+                # self._randomize_color(obj=obj, color=color)
             
         # Merge actors across all sub-scenes, except for table_scenes, which are not Actors.
         # self.table_scene = Actor.merge(self.table_scenes, name="table-workspace")
@@ -359,31 +362,33 @@ class PushCubeRandomizedEnv(PushCubeEnv):
 
     def _load_lighting(self, options: dict):
         if "lighting" not in options.keys():
-            super()._load_lighting()
+            super()._load_lighting(options)
         else:
             # Set shared shadow and ambient across all sub-scenes
             shadow = self.enable_shadow
-            ambient_min = np.array(options["lighting"]["ambient"][0])
-            ambient_max = np.array(options["lighting"]["ambient"][1])
-            ambient_light = ambient_min + np.random.rand(3)*(ambient_max - ambient_min)
-            self.scene.set_ambient_light(ambient_light)
+            if "ambient" in options["lighting"]:
+                ambient_min = np.array(options["lighting"]["ambient"][0])
+                ambient_max = np.array(options["lighting"]["ambient"][1])
+                ambient_light = ambient_min + np.random.rand(3)*(ambient_max - ambient_min)
+                self.scene.set_ambient_light(ambient_light)
 
             # Loop through sub-scenes for randomized lights
-            for i in range(len(self.sub_scenes)):
-                # Add specified directional lights
-                for d in options["lighting"]["directional"]:
-                    direction_min = np.array(d["direction"][0])
-                    direction_max = np.array(d["direction"][1])
-                    direction = direction_min + np.random.rand(3)*(direction_max - direction_min)
-                    color_min = np.array(d["color"][0])
-                    color_max = np.array(d["color"][1])
-                    color = color_min + np.random.rand(3)*(color_max - color_min)
-                    self.scene.add_directional_light(
-                        direction, color, shadow=shadow, shadow_scale=5, shadow_map_size=2048,
-                        scene_idxs=[i],
-                    )
-
-                # TODO: Add specified spot and point lights
+            if "directional" in options["lighting"]:
+                for i in range(self.num_envs):
+                    # Add specified directional lights
+                    for d in options["lighting"]["directional"]:
+                        direction_min = np.array(d["direction"][0])
+                        direction_max = np.array(d["direction"][1])
+                        direction = direction_min + np.random.rand(3)*(direction_max - direction_min)
+                        color_min = np.array(d["color"][0])
+                        color_max = np.array(d["color"][1])
+                        color = color_min + np.random.rand(3)*(color_max - color_min)
+                        self.scene.add_directional_light(
+                            direction, color, shadow=shadow, shadow_scale=5, shadow_map_size=2048,
+                            scene_idxs=[i],
+                        )
+    
+                    # TODO: Add specified spot and point lights
 
 
 
