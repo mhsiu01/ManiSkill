@@ -321,7 +321,8 @@ class PushCubeRandomizedEnv(PushCubeEnv):
             # This is useful if you intend to add some visual goal sites as e.g. done in PickCube that aren't actually part of the task
             # and are there just for generating evaluation videos.
             # self._hidden_objects.append(self.goal_region)
-
+        print("Actors spawned.")
+        
         # Check if config exists
         if "actors" in options:
             # If so, loop over sub-scenes and randomize
@@ -348,7 +349,8 @@ class PushCubeRandomizedEnv(PushCubeEnv):
                 # color = color / 255.0
                 # obj = self.objs[i]
                 # self._randomize_color(obj=obj, color=color)
-            
+            print("Actors randomized.")
+                            
         # Merge actors across all sub-scenes, except for table_scenes, which are not Actors.
         # self.table_scene = Actor.merge(self.table_scenes, name="table-workspace")
         self.table = Actor.merge(self.tables, name="table")
@@ -373,6 +375,7 @@ class PushCubeRandomizedEnv(PushCubeEnv):
                     ambient_light = ambient_min + np.random.rand(3)*(ambient_max - ambient_min)
                     ambient_light = np.append(ambient_light, i)
                     self.scene.set_ambient_light(ambient_light)
+                print("Ambient light randomized.")
 
             # Randomized directional lights per sub-scene
             if "directional" in options["lighting"]:
@@ -389,7 +392,7 @@ class PushCubeRandomizedEnv(PushCubeEnv):
                             direction, color, shadow=shadow, shadow_scale=5, shadow_map_size=2048,
                             scene_idxs=[i],
                         )
-    
+                print("Directional lights randomized.")
                     # TODO: Add specified spot and point lights
 
 
