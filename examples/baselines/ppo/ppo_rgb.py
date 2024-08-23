@@ -353,43 +353,49 @@ if __name__ == "__main__":
     options = {
         "reconfigure": True,
         "actors": {
-            # "table-workspace": {
-            #     'texture': True,
-            # },
-            # "ground": {
-            #     'texture': True,
-            # },
-            "cube": {
-                # 'texture': True,
-                # 'type': "actor",
-                'color': ([0.0, 0.0, 0.0], [1.0,1.0,1.0]),
+            "table-workspace": {
+                'texture': True,
             },
+            "ground": {
+                'texture': True,
+            },
+
+            # "peg": {
+            #     # 'texture': True,
+            #     # 'type': "actor",
+            #     'color': ([0.0, 0.0, 0.0], [1.0,1.0,1.0]),
+            # },
+            # "cube": {
+            #     # 'texture': True,
+            #     # 'type': "actor",
+            #     'color': ([0.0, 0.0, 0.0], [1.0,1.0,1.0]),
+            # },
         },
         
-        "lighting": {
-            # Good fit for randomizing light color.
-            "ambient": ([0.1, 0.1, 0.1], [0.5, 0.5, 0.5]),
-            # Good for unusual lighting conditions (underlit, sidelit, etc.)
-            "directional": [
-                # {
-                #     'color': ([0.0, 0.0, 0.0], [1.0, 1.0, 1.0]),
-                #     'direction': ([1.0, 1.0, -1.0], [1.0, 1.0, -1.0])
-                # },
-                {
-                    'color': ([0.5, 0.5, 0.5], [1, 1, 1]),
-                    'direction': ([-1, -1, -1], [1, 1, -0.2])
-                },
-                {
-                    'color': ([0.5, 0.5, 0.5], [1, 1, 1]),
-                    'direction': ([-1, -1, -1], [1, 1, -0.2])
-                },
-            ],
-            # "camera": {
-            #     'type': "camera",
-            #     'pose': [-0.1,0.1],
-            #     ''
-            # },
-        }
+        # "lighting": {
+        #     # Good fit for randomizing light color.
+        #     "ambient": ([0.1, 0.1, 0.1], [0.5, 0.5, 0.5]),
+        #     # Good for unusual lighting conditions (underlit, sidelit, etc.)
+        #     "directional": [
+        #         # {
+        #         #     'color': ([0.0, 0.0, 0.0], [1.0, 1.0, 1.0]),
+        #         #     'direction': ([1.0, 1.0, -1.0], [1.0, 1.0, -1.0])
+        #         # },
+        #         {
+        #             'color': ([0.5, 0.5, 0.5], [1, 1, 1]),
+        #             'direction': ([-1, -1, -1], [1, 1, -0.2])
+        #         },
+        #         {
+        #             'color': ([0.5, 0.5, 0.5], [1, 1, 1]),
+        #             'direction': ([-1, -1, -1], [1, 1, -0.2])
+        #         },
+        #     ],
+        #     # "camera": {
+        #     #     'type': "camera",
+        #     #     'pose': [-0.1,0.1],
+        #     #     ''
+        #     # },
+        # }
     }
     
     # TRY NOT TO MODIFY: start the game
@@ -398,7 +404,7 @@ if __name__ == "__main__":
     
     if "randomized" in args.env_id.lower():
         next_obs, _ = envs.reset(seed=args.seed, options=options)
-        eval_obs, _ = eval_envs.reset(seed=args.seed)
+        eval_obs, _ = eval_envs.reset(seed=args.seed, options=options)
         print(f"Envs reset YES visual randomizations.")
     else:
         next_obs, _ = envs.reset(seed=args.seed)

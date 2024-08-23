@@ -56,8 +56,11 @@ def build_box(
     name: str,
     body_type: str = "dynamic",
     add_collision: bool = True,
+    scene_idxs: Optional[List[int]] = None,
 ):
     builder = scene.create_actor_builder()
+    if scene_idxs is not None:
+        builder.set_scene_idxs(scene_idxs)
     if add_collision:
         builder.add_box_collision(
             half_size=half_sizes,
@@ -78,8 +81,11 @@ def build_sphere(
     name: str,
     body_type: str = "dynamic",
     add_collision: bool = True,
+    scene_idxs: Optional[List[int]] = None,
 ):
     builder = scene.create_actor_builder()
+    if scene_idxs is not None:
+        builder.set_scene_idxs(scene_idxs)
     if add_collision:
         builder.add_sphere_collision(
             radius=radius,
@@ -104,6 +110,8 @@ def build_red_white_target(
 ):
     TARGET_RED = np.array([194, 19, 22, 255]) / 255
     builder = scene.create_actor_builder()
+    if scene_idxs is not None:
+        builder.set_scene_idxs(scene_idxs)
     if scene_idxs is not None:
         builder.set_scene_idxs(scene_idxs)
     builder.add_cylinder_visual(
@@ -164,8 +172,11 @@ def build_twocolor_peg(
     name: str,
     body_type="dynamic",
     add_collision: bool = True,
+    scene_idxs: Optional[List[int]] = None,
 ):
     builder = scene.create_actor_builder()
+    if scene_idxs is not None:
+        builder.set_scene_idxs(scene_idxs)
     if add_collision:
         builder.add_box_collision(
             half_size=[length, width, width],
@@ -203,11 +214,14 @@ def build_fourcolor_peg(
     color_4=[1, 1, 1, 1],
     body_type="dynamic",
     add_collision: bool = True,
+    scene_idxs: Optional[List[int]] = None,
 ):
     """
     A peg with four sections and four different colors. Useful for visualizing every possible rotation without any symmetries
     """
     builder = scene.create_actor_builder()
+    if scene_idxs is not None:
+        builder.set_scene_idxs(scene_idxs)
     if add_collision:
         builder.add_box_collision(
             half_size=[length, width, width],
@@ -250,9 +264,11 @@ def build_colorful_cube(
     name: str,
     body_type: str = "dynamic",
     add_collision: bool = True,
+    scene_idxs: Optional[List[int]] = None,
 ):
     builder = scene.create_actor_builder()
-
+    if scene_idxs is not None:
+        builder.set_scene_idxs(scene_idxs)
     if add_collision:
         builder._mass = 0.1
         cube_material = sapien.pysapien.physx.PhysxMaterial(
