@@ -128,106 +128,25 @@ class LiftPegUprightEnv(BaseEnv):
 
 
 
-
-# import os
-# import random
-# import sapien
-# from mani_skill.utils.structs.actor import Actor
-from ...utils.randomization import common as rand_funcs
-from rand_funcs import *
+from mani_skill.utils.structs.actor import Actor
+from ...utils.randomization import visual
 
 @register_env("LiftPegUprightRandomized-v1", max_episode_steps=50)
 class LiftPegUprightRandomizedEnv(LiftPegUprightEnv):
     
     def __init__(self, *args, robot_uids="panda", robot_init_qpos_noise=0.02, **kwargs):
-        self.texture_files = _load_textures()
+        self.texture_files = visual._load_textures()
         # Vanilla init
         super().__init__(*args, robot_uids=robot_uids, robot_init_qpos_noise=robot_init_qpos_noise, **kwargs)
-        
-    # def _randomize_texture(self, obj):
-    #     path = random.sample(self.texture_files,1)[0]
-    #     texture = sapien.render.RenderTexture2D(filename=path)
-    #     for part in obj._objs:
-    #         for render_shape in part.find_component_by_type(sapien.render.RenderBodyComponent).render_shapes:
-    #             for triangle in render_shape.parts:
-    #                 triangle.material.set_base_color_texture(texture)
-    
-    # def _randomize_color(self, obj, color):
-    #     if len(color)==2:
-    #         color_min = np.array(color[0])
-    #         color_max = np.array(color[1])
-    #         # Uniform sample within interval [color_min, color_max]
-    #         final_color = color_min + np.random.rand(3)*(color_max - color_min)
-    #     else:
-    #         final_color = color
-    #     final_color = np.append(final_color, 1.0) # Append 4th alpha channel
-            
-    #     for part in obj._objs:
-    #         for render_shape in part.find_component_by_type(sapien.render.RenderBodyComponent).render_shapes:
-    #             for triangle in render_shape.parts:
-    #                 triangle.material.set_base_color(final_color)
 
     def _load_lighting(self, options: dict):
         if "lighting" not in options.keys():
             super()._load_lighting(options)
         else:  
-            common._load_custom_lighting(env=self, options=options)
-    # def _load_lighting(self, options: dict):
-    #     if "lighting" not in options.keys():
-    #         super()._load_lighting(options)
-    #     else:
-    #         # Set shared shadow 
-    #         shadow = self.enable_shadow
-    #         # Randomized ambient light per sub-scene
-    #         if "ambient" in options["lighting"]:
-    #             ambient_min = np.array(options["lighting"]["ambient"][0])
-    #             ambient_max = np.array(options["lighting"]["ambient"][1])
-    #             for i in range(self.num_envs):
-    #                 ambient_light = ambient_min + np.random.rand(3)*(ambient_max - ambient_min)
-    #                 ambient_light = np.append(ambient_light, i)
-    #                 self.scene.set_ambient_light(ambient_light)
-    #             print("Ambient light randomized.")
-
-    #         # Randomized directional lights per sub-scene
-    #         if "directional" in options["lighting"]:
-    #             for i in range(self.num_envs):
-    #                 # Add config-specified directional lights per sub-scene
-    #                 for d in options["lighting"]["directional"]:
-    #                     direction_min = np.array(d["direction"][0])
-    #                     direction_max = np.array(d["direction"][1])
-    #                     direction = direction_min + np.random.rand(3)*(direction_max - direction_min)
-    #                     color_min = np.array(d["color"][0])
-    #                     color_max = np.array(d["color"][1])
-    #                     color = color_min + np.random.rand(3)*(color_max - color_min)
-    #                     self.scene.add_directional_light(
-    #                         direction, color, shadow=shadow, shadow_scale=5, shadow_map_size=2048,
-    #                         scene_idxs=[i],
-    #                     )
-    #             print("Directional lights randomized.")
-    #                 # TODO: Add specified spot and point lights
-
-    # # Convenience method forrandomizing tabletop tasks
-    # def _load_table_scenes(self):
-    #     self.tables = []
-    #     self.grounds = []
-    #     self.table_scenes = []
-
-    #     for i in range(self.num_envs):
-    #         table_scene = TableSceneBuilder(
-    #             env=self, robot_init_qpos_noise=self.robot_init_qpos_noise
-    #         )
-    #         table_scene.build(scene_idxs=[i])
-    #         self.tables.append(table_scene.table)
-    #         self.grounds.append(table_scene.ground)
-    #         self.table_scenes.append(table_scene) # Not for merging, but for initialization
-
-    #     # Merge table-related actors
-    #     self.table = Actor.merge(self.tables, name="table")
-    #     self.ground = Actor.merge(self.grounds, name="ground")
-
+            visual._load_custom_lighting(env=self, options=options)
 
     def _load_scene(self, options: dict):
-        common._load_table_scenes(env=self)
+        visual._load_table_scenes(env=self)
         
         self.pegs = []        
         for i in range(self.num_envs):
@@ -256,9 +175,9 @@ class LiftPegUprightRandomizedEnv(LiftPegUprightEnv):
                     # Apply all randomizations to this actor
                     for rand_type, rand_value in rand_dict.items():
                         if rand_type=="texture" and rand_value is True:
-                            common._randomize_texture(env=self, obj=actor)
+                            visual._randomize_texture(env=self, obj=actor)
                         elif rand_type=="color":
-                            common._randomize_color(obj=actor, color=rand_value)
+                            visual._randomize_color(obj=actor, color=rand_value)
             print("Actors randomized.")
 
 

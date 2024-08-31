@@ -231,10 +231,8 @@ class PushCubeEnv(BaseEnv):
         return self.compute_dense_reward(obs=obs, action=action, info=info) / max_reward
 
 
-import os
-import random
-import sapien
 from mani_skill.utils.structs.actor import Actor
+from ...utils.randomization import visual
 
 @register_env("PushCubeRandomized-v1", max_episode_steps=50)
 class PushCubeRandomizedEnv(PushCubeEnv):
@@ -243,34 +241,34 @@ class PushCubeRandomizedEnv(PushCubeEnv):
     
     def __init__(self, *args, robot_uids="panda", robot_init_qpos_noise=0.02, **kwargs):
         # Prepare textures
-        self.texture_files = os.listdir(self.texture_dir)
-        self.texture_files = [os.path.join(self.texture_dir,f) for f in self.texture_files if f.endswith(".png")]
-        print(f"Found {len(self.texture_files)} texture files.")
+        self.texture_files = visual._load_textures()
         # Vanilla PushCube init
         super().__init__(*args, robot_uids=robot_uids, robot_init_qpos_noise=robot_init_qpos_noise, **kwargs)
-        
-    def _randomize_texture(self, obj):
-        path = random.sample(self.texture_files,1)[0]
-        texture = sapien.render.RenderTexture2D(filename=path)
-        for part in obj._objs:
-            for render_shape in part.find_component_by_type(sapien.render.RenderBodyComponent).render_shapes:
-                for triangle in render_shape.parts:
-                    triangle.material.set_base_color_texture(texture)
+
+    @property
+    def _default_sensor_configs(self):
+        # registers one 128x128 camera looking at the robot, cube, and target
+        # a smaller sized camera will be lower quality, but render faster
+        pose = sapien_utils.look_at(eye=[0.3, 0, 0.6], target=[-0.1, 0, 0.1])
+        # pose = Pose.create(pose)
+        # pose = pose * Pose.create_from_pq(
+        #     p=torch.rand((self.num_envs, 3)) * 0.05 - 0.025,
+        #     q=randomization.random_quaternions(
+        #         n=self.num_envs, device=self.device, bounds=(-np.pi / 24, np.pi / 24)
+        #     ),
+        # )
+        return [
+            CameraConfig(
+                "base_camera",
+                pose=pose,
+                width=128,
+                height=128,
+                fov=np.pi / 2,
+                near=0.01,
+                far=100,
+            )
+        ]
     
-    def _randomize_color(self, obj, color):
-        if len(color)==2:
-            color_min = np.array(color[0])
-            color_max = np.array(color[1])
-            # Uniform sample within interval [color_min, color_max]
-            final_color = color_min + np.random.rand(3)*(color_max - color_min)
-        else:
-            final_color = color
-        final_color = np.append(final_color, 1.0) # Append 4th alpha channel
-            
-        for part in obj._objs:
-            for render_shape in part.find_component_by_type(sapien.render.RenderBodyComponent).render_shapes:
-                for triangle in render_shape.parts:
-                    triangle.material.set_base_color(final_color)
                 
     def _load_scene(self, options: dict):
         self.table_scenes = []
@@ -333,22 +331,10 @@ class PushCubeRandomizedEnv(PushCubeEnv):
                     # Apply all randomizations to this actor
                     for rand_type, rand_value in rand_dict.items():
                         if rand_type=="texture" and rand_value is True:
-                            self._randomize_texture(obj=actor)
+                            visual._randomize_texture(env=self, obj=actor)
                         elif rand_type=="color":
-                            self._randomize_color(obj=actor, color=rand_value)
+                            visual._randomize_color(obj=actor, color=rand_value)
                         
-                # # Randomize table texture
-                # table = self.tables[i]
-                # self._randomize_texture(obj=table)
-                # # Randomize ground texture
-                # ground = self.grounds[i]
-                # self._randomize_texture(obj=ground)
-                # # Randomize cube color: Cycle through red, green, and blue cubes
-                # color = np.array([0,0,0,255])
-                # color[i%3] = 255
-                # color = color / 255.0
-                # obj = self.objs[i]
-                # self._randomize_color(obj=obj, color=color)
             print("Actors randomized.")
                             
         # Merge actors across all sub-scenes, except for table_scenes, which are not Actors.
@@ -359,43 +345,11 @@ class PushCubeRandomizedEnv(PushCubeEnv):
         self.goal_region = Actor.merge(self.goal_regions, name="goal_region")
 
 
-
-
     def _load_lighting(self, options: dict):
         if "lighting" not in options.keys():
             super()._load_lighting(options)
         else:
-            # Set shared shadow 
-            shadow = self.enable_shadow
-            # Randomized ambient light per sub-scene
-            if "ambient" in options["lighting"]:
-                ambient_min = np.array(options["lighting"]["ambient"][0])
-                ambient_max = np.array(options["lighting"]["ambient"][1])
-                for i in range(self.num_envs):
-                    ambient_light = ambient_min + np.random.rand(3)*(ambient_max - ambient_min)
-                    ambient_light = np.append(ambient_light, i)
-                    self.scene.set_ambient_light(ambient_light)
-                print("Ambient light randomized.")
-
-            # Randomized directional lights per sub-scene
-            if "directional" in options["lighting"]:
-                for i in range(self.num_envs):
-                    # Add config-specified directional lights per sub-scene
-                    for d in options["lighting"]["directional"]:
-                        direction_min = np.array(d["direction"][0])
-                        direction_max = np.array(d["direction"][1])
-                        direction = direction_min + np.random.rand(3)*(direction_max - direction_min)
-                        color_min = np.array(d["color"][0])
-                        color_max = np.array(d["color"][1])
-                        color = color_min + np.random.rand(3)*(color_max - color_min)
-                        self.scene.add_directional_light(
-                            direction, color, shadow=shadow, shadow_scale=5, shadow_map_size=2048,
-                            scene_idxs=[i],
-                        )
-                print("Directional lights randomized.")
-                    # TODO: Add specified spot and point lights
-
-
+            visual._load_custom_lighting(env=self, options=options)
 
     
     def _initialize_episode(self, env_idx: torch.Tensor, options: dict):
