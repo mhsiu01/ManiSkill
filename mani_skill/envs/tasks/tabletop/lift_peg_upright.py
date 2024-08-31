@@ -133,9 +133,8 @@ from ...utils.randomization import visual
 
 @register_env("LiftPegUprightRandomized-v1", max_episode_steps=50)
 class LiftPegUprightRandomizedEnv(LiftPegUprightEnv):
-    
     def __init__(self, *args, robot_uids="panda", robot_init_qpos_noise=0.02, **kwargs):
-        self.texture_files = visual._load_textures()
+        self.texture_files = visual.load_textures()
         # Vanilla init
         super().__init__(*args, robot_uids=robot_uids, robot_init_qpos_noise=robot_init_qpos_noise, **kwargs)
 
@@ -143,10 +142,10 @@ class LiftPegUprightRandomizedEnv(LiftPegUprightEnv):
         if "lighting" not in options.keys():
             super()._load_lighting(options)
         else:  
-            visual._load_custom_lighting(env=self, options=options)
+            visual.load_custom_lighting(env=self, options=options)
 
     def _load_scene(self, options: dict):
-        visual._load_table_scenes(env=self)
+        visual.load_table_scenes(env=self)
         
         self.pegs = []        
         for i in range(self.num_envs):
@@ -175,9 +174,9 @@ class LiftPegUprightRandomizedEnv(LiftPegUprightEnv):
                     # Apply all randomizations to this actor
                     for rand_type, rand_value in rand_dict.items():
                         if rand_type=="texture" and rand_value is True:
-                            visual._randomize_texture(env=self, obj=actor)
+                            visual.randomize_texture(env=self, obj=actor)
                         elif rand_type=="color":
-                            visual._randomize_color(obj=actor, color=rand_value)
+                            visual.randomize_color(obj=actor, color=rand_value)
             print("Actors randomized.")
 
 

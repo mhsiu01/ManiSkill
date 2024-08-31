@@ -10,7 +10,7 @@ from mani_skill.utils.structs.actor import Actor
 from mani_skill.utils.scene_builder.table import TableSceneBuilder
 
 
-def _load_textures():
+def load_textures():
     # Prepare list of textures to sample from.
     texture_dir = "/fast-vol/robot-colosseum/colosseum/assets/textures"
     # Prepare textures
@@ -19,7 +19,7 @@ def _load_textures():
     print(f"Found {len(texture_files)} texture files.")
     return texture_files
     
-def _randomize_texture(env, obj):
+def randomize_texture(env, obj):
     path = random.sample(env.texture_files,1)[0]
     texture = sapien.render.RenderTexture2D(filename=path)
     for part in obj._objs:
@@ -27,7 +27,7 @@ def _randomize_texture(env, obj):
             for triangle in render_shape.parts:
                 triangle.material.set_base_color_texture(texture)
 
-def _randomize_color(obj, color):
+def randomize_color(obj, color):
     if len(color)==2:
         color_min = np.array(color[0])
         color_max = np.array(color[1])
@@ -43,7 +43,7 @@ def _randomize_color(obj, color):
                 triangle.material.set_base_color(final_color)
 
 
-def _load_custom_lighting(env, options: dict):
+def load_custom_lighting(env, options: dict):
     # Set shared shadow 
     shadow = env.enable_shadow
     # Randomized ambient light per sub-scene
@@ -76,7 +76,7 @@ def _load_custom_lighting(env, options: dict):
 
 
 # Convenience method for randomizing tabletop tasks by building individual subscenes and merging.
-def _load_table_scenes(env):
+def load_table_scenes(env):
     env.tables = []
     env.grounds = []
     env.table_scenes = []

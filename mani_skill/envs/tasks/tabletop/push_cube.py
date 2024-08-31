@@ -233,15 +233,13 @@ class PushCubeEnv(BaseEnv):
 
 from mani_skill.utils.structs.actor import Actor
 from ...utils.randomization import visual
+from mani_skill.envs.utils import randomization
 
 @register_env("PushCubeRandomized-v1", max_episode_steps=50)
 class PushCubeRandomizedEnv(PushCubeEnv):
-    # Prepare list of textures to sample from.
-    texture_dir = "/fast-vol/robot-colosseum/colosseum/assets/textures"
-    
     def __init__(self, *args, robot_uids="panda", robot_init_qpos_noise=0.02, **kwargs):
         # Prepare textures
-        self.texture_files = visual._load_textures()
+        self.texture_files = visual.load_textures()
         # Vanilla PushCube init
         super().__init__(*args, robot_uids=robot_uids, robot_init_qpos_noise=robot_init_qpos_noise, **kwargs)
 
@@ -250,13 +248,13 @@ class PushCubeRandomizedEnv(PushCubeEnv):
         # registers one 128x128 camera looking at the robot, cube, and target
         # a smaller sized camera will be lower quality, but render faster
         pose = sapien_utils.look_at(eye=[0.3, 0, 0.6], target=[-0.1, 0, 0.1])
-        # pose = Pose.create(pose)
-        # pose = pose * Pose.create_from_pq(
-        #     p=torch.rand((self.num_envs, 3)) * 0.05 - 0.025,
-        #     q=randomization.random_quaternions(
-        #         n=self.num_envs, device=self.device, bounds=(-np.pi / 24, np.pi / 24)
-        #     ),
-        # )
+        pose = Pose.create(pose)
+        pose = pose * Pose.create_from_pq(
+            p=torch.rand((self.num_envs, 3)) * 0.05 - 0.025,
+            q=randomization.random_quaternions(
+                n=self.num_envs, device=self.device, bounds=(-np.pi / 24, np.pi / 24)
+            ),
+        )
         return [
             CameraConfig(
                 "base_camera",
@@ -331,9 +329,9 @@ class PushCubeRandomizedEnv(PushCubeEnv):
                     # Apply all randomizations to this actor
                     for rand_type, rand_value in rand_dict.items():
                         if rand_type=="texture" and rand_value is True:
-                            visual._randomize_texture(env=self, obj=actor)
+                            visual.randomize_texture(env=self, obj=actor)
                         elif rand_type=="color":
-                            visual._randomize_color(obj=actor, color=rand_value)
+                            visual.randomize_color(obj=actor, color=rand_value)
                         
             print("Actors randomized.")
                             
@@ -349,7 +347,7 @@ class PushCubeRandomizedEnv(PushCubeEnv):
         if "lighting" not in options.keys():
             super()._load_lighting(options)
         else:
-            visual._load_custom_lighting(env=self, options=options)
+            visual.load_custom_lighting(env=self, options=options)
 
     
     def _initialize_episode(self, env_idx: torch.Tensor, options: dict):
