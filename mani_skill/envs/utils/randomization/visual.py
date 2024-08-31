@@ -2,6 +2,7 @@ import os
 from typing import Sequence, Union
 import random
 
+import numpy as np
 import torch
 
 import sapien

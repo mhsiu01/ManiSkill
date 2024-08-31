@@ -353,17 +353,17 @@ if __name__ == "__main__":
     options = {
         "reconfigure": True,
         "camera": {
-            "p_noise": 0.05,
-            "q_noise": np.pi/24,
+            "p_noise": 0.15,
+            "q_noise": np.pi/12,
         },
         
-        # "actors": {
-            # "table-workspace": {
-            #     'texture': True,
-            # },
-            # "ground": {
-            #     'texture': True,
-            # },
+        "actors": {
+            "table-workspace": {
+                'texture': True,
+            },
+            "ground": {
+                'texture': True,
+            },
 
             # "peg": {
             #     # 'texture': True,
@@ -375,32 +375,28 @@ if __name__ == "__main__":
             #     # 'type': "actor",
             #     'color': ([0.0, 0.0, 0.0], [1.0,1.0,1.0]),
             # },
-        # },
+        },
         
-        # "lighting": {
-        #     # Good fit for randomizing light color.
-        #     "ambient": ([0.1, 0.1, 0.1], [0.5, 0.5, 0.5]),
-        #     # Good for unusual lighting conditions (underlit, sidelit, etc.)
-        #     "directional": [
-        #         # {
-        #         #     'color': ([0.0, 0.0, 0.0], [1.0, 1.0, 1.0]),
-        #         #     'direction': ([1.0, 1.0, -1.0], [1.0, 1.0, -1.0])
-        #         # },
-        #         {
-        #             'color': ([0.5, 0.5, 0.5], [1, 1, 1]),
-        #             'direction': ([-1, -1, -1], [1, 1, -0.2])
-        #         },
-        #         {
-        #             'color': ([0.5, 0.5, 0.5], [1, 1, 1]),
-        #             'direction': ([-1, -1, -1], [1, 1, -0.2])
-        #         },
-        #     ],
-        #     # "camera": {
-        #     #     'type': "camera",
-        #     #     'pose': [-0.1,0.1],
-        #     #     ''
-        #     # },
-        # }
+        "lighting": {
+            # Good fit for randomizing light color.
+            "ambient": ([0.1, 0.1, 0.1], [0.5, 0.5, 0.5]),
+            # Good for unusual lighting conditions (underlit, sidelit, etc.)
+            "directional": [
+                # {
+                #     'color': ([0.0, 0.0, 0.0], [1.0, 1.0, 1.0]),
+                #     'direction': ([1.0, 1.0, -1.0], [1.0, 1.0, -1.0])
+                # },
+                {
+                    'color': ([0.5, 0.5, 0.5], [1, 1, 1]),
+                    'direction': ([-1, -1, -1], [1, 1, -0.2])
+                },
+                {
+                    'color': ([0.5, 0.5, 0.5], [1, 1, 1]),
+                    'direction': ([-1, -1, -1], [1, 1, -0.2])
+                },
+            ],
+
+        }
     }
     
     # TRY NOT TO MODIFY: start the game
