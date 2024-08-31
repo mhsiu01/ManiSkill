@@ -352,13 +352,18 @@ if __name__ == "__main__":
 
     options = {
         "reconfigure": True,
-        "actors": {
-            "table-workspace": {
-                'texture': True,
-            },
-            "ground": {
-                'texture': True,
-            },
+        "camera": {
+            "p_noise": 0.05,
+            "q_noise": np.pi/24,
+        },
+        
+        # "actors": {
+            # "table-workspace": {
+            #     'texture': True,
+            # },
+            # "ground": {
+            #     'texture': True,
+            # },
 
             # "peg": {
             #     # 'texture': True,
@@ -370,7 +375,7 @@ if __name__ == "__main__":
             #     # 'type': "actor",
             #     'color': ([0.0, 0.0, 0.0], [1.0,1.0,1.0]),
             # },
-        },
+        # },
         
         # "lighting": {
         #     # Good fit for randomizing light color.

@@ -234,6 +234,7 @@ class PushCubeEnv(BaseEnv):
 from mani_skill.utils.structs.actor import Actor
 from ...utils.randomization import visual
 from mani_skill.envs.utils import randomization
+import sapien
 
 @register_env("PushCubeRandomized-v1", max_episode_steps=50)
 class PushCubeRandomizedEnv(PushCubeEnv):
@@ -245,25 +246,18 @@ class PushCubeRandomizedEnv(PushCubeEnv):
 
     @property
     def _default_sensor_configs(self):
-        # registers one 128x128 camera looking at the robot, cube, and target
-        # a smaller sized camera will be lower quality, but render faster
-        pose = sapien_utils.look_at(eye=[0.3, 0, 0.6], target=[-0.1, 0, 0.1])
-        pose = Pose.create(pose)
-        pose = pose * Pose.create_from_pq(
-            p=torch.rand((self.num_envs, 3)) * 0.05 - 0.025,
-            q=randomization.random_quaternions(
-                n=self.num_envs, device=self.device, bounds=(-np.pi / 24, np.pi / 24)
-            ),
-        )
+        # # registers one 128x128 camera looking at the robot, cube, and target
+        # # a smaller sized camera will be lower quality, but render faster
         return [
             CameraConfig(
                 "base_camera",
-                pose=pose,
+                pose=sapien.Pose(),
                 width=128,
-                height=128,
+                height=128, 
                 fov=np.pi / 2,
                 near=0.01,
-                far=100,
+                far=100, 
+                mount=self.cam_mount
             )
         ]
     
@@ -342,6 +336,9 @@ class PushCubeRandomizedEnv(PushCubeEnv):
         self.obj = Actor.merge(self.objs, name="cube")
         self.goal_region = Actor.merge(self.goal_regions, name="goal_region")
 
+        # Mount camera for later pose randomization
+        self.cam_mount = self.scene.create_actor_builder().build_kinematic("camera_mount")
+
 
     def _load_lighting(self, options: dict):
         if "lighting" not in options.keys():
@@ -388,4 +385,16 @@ class PushCubeRandomizedEnv(PushCubeEnv):
                     q=euler2quat(0, np.pi / 2, 0),
                 )
             )
-    
+            # Randomizing mounted camera pose
+            if "camera" in options:
+                p_noise = options["camera"]["p_noise"]
+                q_noise = options["camera"]["q_noise"]
+                pose = sapien_utils.look_at(eye=[0.3, 0, 0.6], target=[-0.1, 0, 0.1])
+                pose = Pose.create(pose)
+                pose = pose * Pose.create_from_pq(
+                    p=torch.rand((self.num_envs, 3)) * p_noise - (p_noise*0.5),
+                    q=randomization.random_quaternions(
+                        n=self.num_envs, device=self.device, bounds=(-q_noise, q_noise)
+                    ),
+                )
+                self.cam_mount.set_pose(pose)
