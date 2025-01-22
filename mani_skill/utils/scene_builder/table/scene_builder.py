@@ -43,7 +43,11 @@ class TableSceneBuilder(SceneBuilder):
         builder.add_visual_from_file(
             filename=table_model_file, scale=[scale] * 3, pose=table_pose
         )
+        builder.initial_pose = sapien.Pose(
+            p=[-0.12, 0, -0.9196429], q=euler2quat(0, 0, np.pi / 2)
+        )
         table = builder.build_kinematic(name=table_name)
+
         aabb = (
             table._objs[0]
             .find_component_by_type(sapien.render.RenderBodyComponent)
@@ -65,7 +69,7 @@ class TableSceneBuilder(SceneBuilder):
         # table_height = 0.9196429
         b = len(env_idx)
         self.table.set_pose(
-            sapien.Pose(p=[-0.12, 0, -self.table_height], q=euler2quat(0, 0, np.pi / 2))
+            sapien.Pose(p=[-0.12, 0, -0.9196429], q=euler2quat(0, 0, np.pi / 2))
         )
         # Only need to initialize robots once, since it spans all sub-scenes.
         # Hence, skip if scene_idxs not specified or >0 (hence already initialized).
@@ -88,12 +92,20 @@ class TableSceneBuilder(SceneBuilder):
                     0.04,
                 ]
             )
-            qpos = (
-                self.env._episode_rng.normal(
-                    0, self.robot_init_qpos_noise, (b, len(qpos))
+            if self.env._enhanced_determinism:
+                qpos = (
+                    self.env._batched_episode_rng[env_idx].normal(
+                        0, self.robot_init_qpos_noise, len(qpos)
+                    )
+                    + qpos
                 )
-                + qpos
-            )
+            else:
+                qpos = (
+                    self.env._episode_rng.normal(
+                        0, self.robot_init_qpos_noise, (b, len(qpos))
+                    )
+                    + qpos
+                )
             qpos[:, -2:] = 0.04
             self.env.agent.reset(qpos)
             self.env.agent.robot.set_pose(sapien.Pose([-0.615, 0, 0]))
@@ -103,12 +115,20 @@ class TableSceneBuilder(SceneBuilder):
                 [0.0, np.pi / 8, 0, -np.pi * 5 / 8, 0, np.pi * 3 / 4, -np.pi / 4, 0.04, 0.04]
             )
             # fmt: on
-            qpos = (
-                self.env._episode_rng.normal(
-                    0, self.robot_init_qpos_noise, (b, len(qpos))
+            if self.env._enhanced_determinism:
+                qpos = (
+                    self.env._batched_episode_rng[env_idx].normal(
+                        0, self.robot_init_qpos_noise, len(qpos)
+                    )
+                    + qpos
                 )
-                + qpos
-            )
+            else:
+                qpos = (
+                    self.env._episode_rng.normal(
+                        0, self.robot_init_qpos_noise, (b, len(qpos))
+                    )
+                    + qpos
+                )
             qpos[:, -2:] = 0.04
             self.env.agent.reset(qpos)
             self.env.agent.robot.set_pose(sapien.Pose([-0.615, 0, 0]))
@@ -116,12 +136,20 @@ class TableSceneBuilder(SceneBuilder):
             qpos = np.array(
                 [0, np.pi / 6, 0, np.pi / 3, 0, np.pi / 2, -np.pi / 2, 0, 0]
             )
-            qpos = (
-                self.env._episode_rng.normal(
-                    0, self.robot_init_qpos_noise, (b, len(qpos))
+            if self.env._enhanced_determinism:
+                qpos = (
+                    self.env._batched_episode_rng[env_idx].normal(
+                        0, self.robot_init_qpos_noise, len(qpos)
+                    )
+                    + qpos
                 )
-                + qpos
-            )
+            else:
+                qpos = (
+                    self.env._episode_rng.normal(
+                        0, self.robot_init_qpos_noise, (b, len(qpos))
+                    )
+                    + qpos
+                )
             qpos[:, -2:] = 0
             self.env.agent.reset(qpos)
             self.env.agent.robot.set_pose(sapien.Pose([-0.562, 0, 0]))
@@ -166,12 +194,58 @@ class TableSceneBuilder(SceneBuilder):
                     0.04,
                 ]
             )
-            qpos = (
-                self.env._episode_rng.normal(
-                    0, self.robot_init_qpos_noise, (b, len(qpos))
+            if self.env._enhanced_determinism:
+                qpos = (
+                    self.env._batched_episode_rng[env_idx].normal(
+                        0, self.robot_init_qpos_noise, len(qpos)
+                    )
+                    + qpos
                 )
-                + qpos
+            else:
+                qpos = (
+                    self.env._episode_rng.normal(
+                        0, self.robot_init_qpos_noise, (b, len(qpos))
+                    )
+                    + qpos
+                )
+            qpos[:, -2:] = 0.04
+            agent.agents[1].reset(qpos)
+            agent.agents[1].robot.set_pose(
+                sapien.Pose([0, 0.75, 0], q=euler2quat(0, 0, -np.pi / 2))
             )
+            agent.agents[0].reset(qpos)
+            agent.agents[0].robot.set_pose(
+                sapien.Pose([0, -0.75, 0], q=euler2quat(0, 0, np.pi / 2))
+            )
+        elif self.env.robot_uids == ("panda_wristcam", "panda_wristcam"):
+            agent: MultiAgent = self.env.agent
+            qpos = np.array(
+                [
+                    0.0,
+                    np.pi / 8,
+                    0,
+                    -np.pi * 5 / 8,
+                    0,
+                    np.pi * 3 / 4,
+                    np.pi / 4,
+                    0.04,
+                    0.04,
+                ]
+            )
+            if self.env._enhanced_determinism:
+                qpos = (
+                    self.env._batched_episode_rng[env_idx].normal(
+                        0, self.robot_init_qpos_noise, len(qpos)
+                    )
+                    + qpos
+                )
+            else:
+                qpos = (
+                    self.env._episode_rng.normal(
+                        0, self.robot_init_qpos_noise, (b, len(qpos))
+                    )
+                    + qpos
+                )
             qpos[:, -2:] = 0.04
             agent.agents[1].reset(qpos)
             agent.agents[1].robot.set_pose(
@@ -188,3 +262,31 @@ class TableSceneBuilder(SceneBuilder):
         ):
             # Need to specify the robot qpos for each sub-scenes using tensor api
             pass
+        elif self.env.robot_uids == "panda_stick":
+            qpos = np.array(
+                [
+                    0.0,
+                    np.pi / 8,
+                    0,
+                    -np.pi * 5 / 8,
+                    0,
+                    np.pi * 3 / 4,
+                    np.pi / 4,
+                ]
+            )
+            if self.env._enhanced_determinism:
+                qpos = (
+                    self.env._batched_episode_rng[env_idx].normal(
+                        0, self.robot_init_qpos_noise, len(qpos)
+                    )
+                    + qpos
+                )
+            else:
+                qpos = (
+                    self.env._episode_rng.normal(
+                        0, self.robot_init_qpos_noise, (b, len(qpos))
+                    )
+                    + qpos
+                )
+            self.env.agent.reset(qpos)
+            self.env.agent.robot.set_pose(sapien.Pose([-0.615, 0, 0]))
