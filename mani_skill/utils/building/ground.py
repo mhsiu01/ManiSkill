@@ -26,6 +26,7 @@ def build_ground(
     texture_square_len=4,
     mipmap_levels=4,
     add_collision=True,
+    scene_idxs=None,
 ):
     """Procedurally creates a checkered floor given a floor width in meters.
 

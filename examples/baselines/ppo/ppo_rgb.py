@@ -3,6 +3,7 @@ from collections import defaultdict
 import os
 import random
 import time
+import json
 from dataclasses import dataclass
 from typing import Optional
 
@@ -366,67 +367,25 @@ if __name__ == "__main__":
     dones = torch.zeros((args.num_steps, args.num_envs)).to(device)
     values = torch.zeros((args.num_steps, args.num_envs)).to(device)
 
-    options = {
-        "reconfigure": True,
-        "camera": {
-            "p_noise": 0.15,
-            "q_noise": np.pi/12,
-        },
-        
-        "actors": {
-            "table-workspace": {
-                'texture': True,
-            },
-            "ground": {
-                'texture': True,
-            },
-
-            # "peg": {
-            #     # 'texture': True,
-            #     # 'type': "actor",
-            #     'color': ([0.0, 0.0, 0.0], [1.0,1.0,1.0]),
-            # },
-            # "cube": {
-            #     # 'texture': True,
-            #     # 'type': "actor",
-            #     'color': ([0.0, 0.0, 0.0], [1.0,1.0,1.0]),
-            # },
-        },
-        
-        "lighting": {
-            # Good fit for randomizing light color.
-            "ambient": ([0.1, 0.1, 0.1], [0.5, 0.5, 0.5]),
-            # Good for unusual lighting conditions (underlit, sidelit, etc.)
-            "directional": [
-                # {
-                #     'color': ([0.0, 0.0, 0.0], [1.0, 1.0, 1.0]),
-                #     'direction': ([1.0, 1.0, -1.0], [1.0, 1.0, -1.0])
-                # },
-                {
-                    'color': ([0.5, 0.5, 0.5], [1, 1, 1]),
-                    'direction': ([-1, -1, -1], [1, 1, -0.2])
-                },
-                {
-                    'color': ([0.5, 0.5, 0.5], [1, 1, 1]),
-                    'direction': ([-1, -1, -1], [1, 1, -0.2])
-                },
-            ],
-
-        }
-    }
     
     # TRY NOT TO MODIFY: start the game
     global_step = 0
     start_time = time.time()
     
     if "randomized" in args.env_id.lower():
+        # Load randomization configuration
+        if os.path.exists("config.txt"):
+            with open("config.txt", 'r') as f:
+                options = json.load(f)
+        else:
+            options = None
         next_obs, _ = envs.reset(seed=args.seed, options=options)
-        eval_obs, _ = eval_envs.reset(seed=args.seed, options=options)
-        print(f"Envs reset YES visual randomizations.")
+        eval_obs, _ = eval_envs.reset(seed=args.seed)
+        print(f"Envs reset WITH visual randomizations.")
     else:
         next_obs, _ = envs.reset(seed=args.seed)
         eval_obs, _ = eval_envs.reset(seed=args.seed)
-        print(f"Envs reset, NO visual randomizations.")
+        print(f"Envs reset, WITHOUT visual randomizations.")
     print(f"Reset time = {time.time() - start_time} seconds")
     
     next_done = torch.zeros(args.num_envs, device=device)
