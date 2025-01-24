@@ -11,5 +11,23 @@
             "color": [[0.0, 0.0, 0.0], [1.0,1.0,1.0]]
         },
         "ground": {"texture": true}
+    },
+    "lighting": {
+        "ambient": [[0.1, 0.1, 0.1], [0.5, 0.5, 0.5]],
+        "directional": [
+          {
+            "color": [[0.5, 0.5, 0.5], [1, 1, 1]],
+            "direction": [[-1, -1, -1], [1, 1, -0.2]]
+          },
+          {
+            "color": [[0.5, 0.5, 0.5], [1, 1, 1]],
+            "direction": [[-1, -1, -1], [1, 1, -0.2]]
+          }
+        ]
+    },
+    "comments": {
+        "actors": "You must specify which actors you want to randomize. Texture is true/false and randomly samples from the required path in 'texture_dir'. Color randomization overrides texture.",
+        "ambient": "Good fit for randomizing light color.",
+        "directional": "Good for unusual lighting conditions (underlit, sidelit, etc.)"
     }
 }
