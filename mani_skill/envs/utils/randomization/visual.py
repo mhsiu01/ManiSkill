@@ -11,12 +11,10 @@ from mani_skill.utils.structs.actor import Actor
 from mani_skill.utils.scene_builder.table import TableSceneBuilder
 
 
-def load_textures():
+def load_textures(texture_dir):
     # Prepare list of textures to sample from.
-    texture_dir = "/fast-vol/robot-colosseum/colosseum/assets/textures"
-    # Prepare textures
     texture_files = os.listdir(texture_dir)
-    texture_files = [os.path.join(texture_dir,f) for f in texture_files if f.endswith(".png")]
+    texture_files = [os.path.join(texture_dir,f) for f in texture_files if f.endswith((".png",".jpg",".jpeg"))]
     print(f"Found {len(texture_files)} texture files.")
     return texture_files
     

@@ -244,8 +244,6 @@ import sapien
 @register_env("PushCubeRandomized-v1", max_episode_steps=50)
 class PushCubeRandomizedEnv(PushCubeEnv):
     def __init__(self, *args, robot_uids="panda", robot_init_qpos_noise=0.02, **kwargs):
-        # Prepare textures
-        self.texture_files = visual.load_textures()
         # Vanilla PushCube init
         super().__init__(*args, robot_uids=robot_uids, robot_init_qpos_noise=robot_init_qpos_noise, **kwargs)
 
@@ -319,7 +317,10 @@ class PushCubeRandomizedEnv(PushCubeEnv):
             # and are there just for generating evaluation videos.
             # self._hidden_objects.append(self.goal_region)
         print("Actors spawned.")
-        
+
+        # Prepare textures
+        if "texture_dir" in options:
+            self.texture_files = visual.load_textures(options["texture_dir"])
         # Check if config exists
         if "actors" in options:
             # If so, loop over sub-scenes and randomize

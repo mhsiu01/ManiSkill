@@ -4,20 +4,12 @@
         "p_noise": 0.15,
         "q_noise": 0.26179938779
     },
-    
+    "texture_dir": "./textures",
     "actors": {
-        "table-workspace": {"texture": true},
-        "ground": {"texture": true},
-        "peg": {
+        "table-workspace": {
+            "texture": false,
             "color": [[0.0, 0.0, 0.0], [1.0,1.0,1.0]]
-        }
-    },
-    
-    "lighting": {
-        "ambient": [[0.1, 0.1, 0.1], [0.5, 0.5, 0.5]],
-        "directional": [
-            {"color": [[0.5, 0.5, 0.5], [1, 1, 1]], "direction": [[-1, -1, -1], [1, 1, -0.2]]},
-            {"color": [[0.5, 0.5, 0.5], [1, 1, 1]], "direction": [[-1, -1, -1], [1, 1, -0.2]]}
-        ]
+        },
+        "ground": {"texture": true}
     }
 }
