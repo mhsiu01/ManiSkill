@@ -195,6 +195,7 @@ class LiftPegUprightRandomizedEnv(LiftPegUprightEnv):
                 color_2=np.array([12, 42, 160, 255]) / 255,
                 name=f"peg-{i}",
                 body_type="dynamic",
+                initial_pose=sapien.Pose(p=[0, 0, 0.1]),
                 scene_idxs=[i],
             )
             self.pegs.append(peg)

@@ -293,6 +293,7 @@ class PushCubeRandomizedEnv(PushCubeEnv):
                 color=np.array([12, 42, 160, 255]) / 255,
                 name=f"cube-{i}",
                 body_type="dynamic",
+                initial_pose=sapien.Pose(p=[0, 0, self.cube_half_size]),
                 scene_idxs=[i],
             )                
             self.objs.append(obj)
@@ -307,6 +308,7 @@ class PushCubeRandomizedEnv(PushCubeEnv):
                 name=f"goal_region-{i}",
                 add_collision=False,
                 body_type="kinematic",
+                initial_pose=sapien.Pose(p=[0, 0, 1e-3]),
                 scene_idxs=[i],
             )
             self.goal_regions.append(goal_region)

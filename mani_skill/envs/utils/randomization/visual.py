@@ -42,6 +42,12 @@ def randomize_color(obj, color):
         for render_shape in part.find_component_by_type(sapien.render.RenderBodyComponent).render_shapes:
             for triangle in render_shape.parts:
                 triangle.material.set_base_color(final_color)
+                triangle.material.set_base_color_texture(None)
+                triangle.material.set_normal_texture(None)
+                triangle.material.set_emission_texture(None)
+                triangle.material.set_transmission_texture(None)
+                triangle.material.set_metallic_texture(None)
+                triangle.material.set_roughness_texture(None)
 
 
 def load_custom_lighting(env, options: dict):
@@ -56,6 +62,8 @@ def load_custom_lighting(env, options: dict):
             ambient_light = np.append(ambient_light, i)
             env.scene.set_ambient_light(ambient_light)
         print("Ambient light randomized.")
+    else:
+        env.scene.set_ambient_light([0.3, 0.3, 0.3])
 
     # Randomized directional lights per sub-scene
     if "directional" in options["lighting"]:
@@ -73,7 +81,13 @@ def load_custom_lighting(env, options: dict):
                     scene_idxs=[i],
                 )
         print("Directional lights randomized.")
-            # TODO: Add specified spot and point lights
+    else:
+        env.scene.add_directional_light(
+            [1, 1, -1], [1, 1, 1], shadow=shadow, shadow_scale=5, shadow_map_size=2048
+        )
+        env.scene.add_directional_light([0, 0, -1], [1, 1, 1])
+    
+    # TODO: Add specified spot and point lights
 
 
 # Convenience method for randomizing tabletop tasks by building individual subscenes and merging.
