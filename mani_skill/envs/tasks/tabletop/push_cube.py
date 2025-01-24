@@ -318,24 +318,25 @@ class PushCubeRandomizedEnv(PushCubeEnv):
             # self._hidden_objects.append(self.goal_region)
         print("Actors spawned.")
 
-        # Prepare textures
-        if "texture_dir" in options:
-            self.texture_files = visual.load_textures(options["texture_dir"])
-        # Check if config exists
-        if "actors" in options:
-            # If so, loop over sub-scenes and randomize
-            for i in range(self.num_envs):
-                # Iterate through specified actors of i-th sub-scene
-                for actor_name, rand_dict in options["actors"].items():
-                    actor = self.scene.actors[f"{actor_name}-{i}"] # eg. actor_name="cube", i=5 --> actor=cube 5
-                    # Apply all randomizations to this actor
-                    for rand_type, rand_value in rand_dict.items():
-                        if rand_type=="texture" and rand_value is True:
-                            visual.randomize_texture(env=self, obj=actor)
-                        elif rand_type=="color":
-                            visual.randomize_color(obj=actor, color=rand_value)
+        visual.randomize_env(self, options)
+        # # Prepare textures
+        # if "texture_dir" in options:
+        #     self.texture_files = visual.load_textures(options["texture_dir"])
+        # # Check if config exists
+        # if "actors" in options:
+        #     # If so, loop over sub-scenes and randomize
+        #     for i in range(self.num_envs):
+        #         # Iterate through specified actors of i-th sub-scene
+        #         for actor_name, rand_dict in options["actors"].items():
+        #             actor = self.scene.actors[f"{actor_name}-{i}"] # eg. actor_name="cube", i=5 --> actor=cube 5
+        #             # Apply all randomizations to this actor
+        #             for rand_type, rand_value in rand_dict.items():
+        #                 if rand_type=="texture" and rand_value is True:
+        #                     visual.randomize_texture(env=self, obj=actor)
+        #                 elif rand_type=="color":
+        #                     visual.randomize_color(obj=actor, color=rand_value)
                         
-            print("Actors randomized.")
+        #     print("Actors randomized.")
                             
         # Merge actors across all sub-scenes, except for table_scenes, which are not Actors.
         # self.table_scene = Actor.merge(self.table_scenes, name="table-workspace")

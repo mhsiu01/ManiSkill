@@ -107,3 +107,27 @@ def load_table_scenes(env):
     env.table = Actor.merge(env.tables, name="table")
     env.ground = Actor.merge(env.grounds, name="ground")
 
+
+
+
+def randomize_env(env, options):
+    # Prepare textures
+    if "texture_dir" in options:
+        env.texture_files = load_textures(options["texture_dir"])
+    # Check if config exists
+    if "actors" in options:
+        # If so, loop over sub-scenes and randomize
+        for i in range(env.num_envs):
+            # Iterate through specified actors of i-th sub-scene
+            for actor_name, rand_dict in options["actors"].items():
+                actor = env.scene.actors[f"{actor_name}-{i}"] # eg. actor_name="cube", i=5 --> actor=cube 5
+                # Apply all randomizations to this actor
+                for rand_type, rand_value in rand_dict.items():
+                    if rand_type=="texture" and rand_value is True:
+                        randomize_texture(env=env, obj=actor)
+                    elif rand_type=="color":
+                        randomize_color(obj=actor, color=rand_value)
+                    
+        print("Actors randomized.")
+    
+
