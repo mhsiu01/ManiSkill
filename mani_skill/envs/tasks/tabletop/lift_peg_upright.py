@@ -158,22 +158,22 @@ class LiftPegUprightRandomizedEnv(LiftPegUprightEnv):
         # Vanilla init
         super().__init__(*args, robot_uids=robot_uids, robot_init_qpos_noise=robot_init_qpos_noise, **kwargs)
         
-    @property
-    def _default_sensor_configs(self):
-        # # registers one 128x128 camera looking at the robot, cube, and target
-        # # a smaller sized camera will be lower quality, but render faster
-        return [
-            CameraConfig(
-                "base_camera",
-                pose=sapien.Pose(),
-                width=128,
-                height=128, 
-                fov=np.pi / 2,
-                near=0.01,
-                far=100, 
-                mount=self.cam_mount
-            )
-        ]
+    # @property
+    # def _default_sensor_configs(self):
+    #     # # registers one 128x128 camera looking at the robot, cube, and target
+    #     # # a smaller sized camera will be lower quality, but render faster
+    #     return [
+    #         CameraConfig(
+    #             "base_camera",
+    #             pose=sapien.Pose(),
+    #             width=128,
+    #             height=128, 
+    #             fov=np.pi / 2,
+    #             near=0.01,
+    #             far=100, 
+    #             mount=self.cam_mount
+    #         )
+    #     ]
         
     def _load_lighting(self, options: dict):
         if "lighting" not in options.keys():
@@ -217,8 +217,8 @@ class LiftPegUprightRandomizedEnv(LiftPegUprightEnv):
                             visual.randomize_color(obj=actor, color=rand_value)
             print("Actors randomized.")
 
-        # Mount camera for later pose randomization
-        self.cam_mount = self.scene.create_actor_builder().build_kinematic("camera_mount")
+        # # Mount camera for later pose randomization
+        # self.cam_mount = self.scene.create_actor_builder().build_kinematic("camera_mount")
 
 
     def _initialize_episode(self, env_idx: torch.Tensor, options: dict):

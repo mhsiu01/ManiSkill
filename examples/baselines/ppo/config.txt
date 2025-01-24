@@ -1,9 +1,5 @@
 {
     "reconfigure": true,
-    "camera": {
-        "p_noise": 0.15,
-        "q_noise": 0.26179938779
-    },
     "texture_dir": "./textures",
     "actors": {
         "table-workspace": {

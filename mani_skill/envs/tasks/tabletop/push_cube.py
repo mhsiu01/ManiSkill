@@ -249,22 +249,30 @@ class PushCubeRandomizedEnv(PushCubeEnv):
 
     @property
     def _default_sensor_configs(self):
-        # # registers one 128x128 camera looking at the robot, cube, and target
-        # # a smaller sized camera will be lower quality, but render faster
+        p_perturb = 0.05
+        q_perturb = np.pi / 24
+        # registers one 128x128 camera looking at the robot, cube, and target
+        # a smaller sized camera will be lower quality, but render faster
+        pose = sapien_utils.look_at(eye=[0.3, 0, 0.6], target=[-0.1, 0, 0.1])
+        pose = Pose.create(pose)
+        pose = pose * Pose.create_from_pq(
+            p=torch.rand((self.num_envs, 3)) * p_perturb - 0.5*p_perturb,
+            q=randomization.random_quaternions(
+                n=self.num_envs, device=self.device, bounds=(-q_perturb, q_perturb)
+            ),
+        )
         return [
             CameraConfig(
                 "base_camera",
-                pose=sapien.Pose(),
+                pose=pose,
                 width=128,
-                height=128, 
+                height=128,
                 fov=np.pi / 2,
                 near=0.01,
-                far=100, 
-                mount=self.cam_mount
+                far=100,
             )
         ]
     
-                
     def _load_scene(self, options: dict):
         self.table_scenes = []
         self.tables = []
@@ -318,25 +326,8 @@ class PushCubeRandomizedEnv(PushCubeEnv):
             # self._hidden_objects.append(self.goal_region)
         print("Actors spawned.")
 
+        # Randomize texture, lighting, color.
         visual.randomize_env(self, options)
-        # # Prepare textures
-        # if "texture_dir" in options:
-        #     self.texture_files = visual.load_textures(options["texture_dir"])
-        # # Check if config exists
-        # if "actors" in options:
-        #     # If so, loop over sub-scenes and randomize
-        #     for i in range(self.num_envs):
-        #         # Iterate through specified actors of i-th sub-scene
-        #         for actor_name, rand_dict in options["actors"].items():
-        #             actor = self.scene.actors[f"{actor_name}-{i}"] # eg. actor_name="cube", i=5 --> actor=cube 5
-        #             # Apply all randomizations to this actor
-        #             for rand_type, rand_value in rand_dict.items():
-        #                 if rand_type=="texture" and rand_value is True:
-        #                     visual.randomize_texture(env=self, obj=actor)
-        #                 elif rand_type=="color":
-        #                     visual.randomize_color(obj=actor, color=rand_value)
-                        
-        #     print("Actors randomized.")
                             
         # Merge actors across all sub-scenes, except for table_scenes, which are not Actors.
         # self.table_scene = Actor.merge(self.table_scenes, name="table-workspace")
@@ -394,16 +385,3 @@ class PushCubeRandomizedEnv(PushCubeEnv):
                     q=euler2quat(0, np.pi / 2, 0),
                 )
             )
-            # Randomizing mounted camera pose
-            if "camera" in options:
-                p_noise = options["camera"]["p_noise"]
-                q_noise = options["camera"]["q_noise"]
-                pose = sapien_utils.look_at(eye=[0.3, 0, 0.6], target=[-0.1, 0, 0.1])
-                pose = Pose.create(pose)
-                pose = pose * Pose.create_from_pq(
-                    p=torch.rand((self.num_envs, 3)) * p_noise - (p_noise*0.5),
-                    q=randomization.random_quaternions(
-                        n=self.num_envs, device=self.device, bounds=(-q_noise, q_noise)
-                    ),
-                )
-                self.cam_mount.set_pose(pose)
